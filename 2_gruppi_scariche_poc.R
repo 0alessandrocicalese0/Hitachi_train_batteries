@@ -1,5 +1,4 @@
 #! ---------------- Leggiamo il Dataset ------------------- 
-
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
@@ -8,7 +7,7 @@ library(ggplot2)
 load("workspace/my_workspace_project_clean.RData")
 #save.image(file = "workspace/my_workspace_project_clean.RData")
 
-data <- readRDS("battery_clean.rds")
+data <- readRDS("dataset/battery_clean.rds")
 
 # Trova i gruppi in cui almeno una osservazione ha POC_ID != 0
 gruppi_con_POC <- unique(data$Gruppo[data$POC_ID != 0])
@@ -266,10 +265,8 @@ generate_plot_P <- function(group) {
 #Riempiamo  il nuovo dataset
 df_C2 <- data.frame(Gruppo = unique(data$Gruppo), stringsAsFactors = FALSE)
 
-
-#Gruppo
-df_C2$Gruppo <- unique(data$Gruppo)
-
+  #Gruppo
+  df_C2$Gruppo <- unique(data$Gruppo)
 
 for (group in seq(1, max(data$Gruppo) - 1)) {
   subset_gruppo <- data[data$Gruppo == group & data$HMI_IBatt_C2 < 0, ]
@@ -310,15 +307,59 @@ for (group in seq(1, max(data$Gruppo) - 1)) {
 df_C2$Timestamp_iniziale <- as.POSIXct(df_C2$Timestamp_iniziale)
 # Elimina le righe di df_C2 in cui POC è NA
 df_C2 <- na.omit(df_C2)
-# 
-# # Imposta la lingua di base su inglese
-# Sys.setlocale("LC_TIME", "C")
-# 
-# plot(df_C2$Timestamp_iniziale, df_C2$V_iniziale, type = "line", col = "blue", xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Line Plot - Battery 1")
-# 
-# 
-# plot(df_C2$Timestamp_iniziale, df_C2$V_iniziale, pch = 16, col = "blue", cex = .5,
-#      xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Scatter Plot - Battery 1")
+
+# Imposta la lingua di base su inglese
+Sys.setlocale("LC_TIME", "C")
+
+data_da_evidenziare <- as.POSIXct("2022-04-07")
+
+plot(df_C2$Timestamp_iniziale, df_C2$V_iniziale, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Initial Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$V_iniziale), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$V_media, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Average Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$V_media), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$V_finale, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Final Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$V_finale), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$I_iniziale, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Initial Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$I_iniziale), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$I_media, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Average Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$I_media), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$I_finale, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Final Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$I_finale), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+
+plot(df_C2$Timestamp_iniziale, df_C2$Durata_scarica, pch = 16, col = "blue", cex = .5,
+     xlab = "Month", ylab = "Discharge duration")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare, max(df_C2$Durata_scarica), format(data_da_evidenziare, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
 
 #df_C2 <- subset(df_C2, select = -Timestamp_iniziale)
 
@@ -370,18 +411,56 @@ df_C4$Timestamp_iniziale <- as.POSIXct(df_C4$Timestamp_iniziale)
 # Elimina le righe di df_C4 in cui POC è NA
 df_C4 <- na.omit(df_C4)
 
-# # Imposta la lingua di base su inglese
-# Sys.setlocale("LC_TIME", "C")
-# 
-# # Line Plot - Battery 4
-# plot(df_C4$Timestamp_iniziale, df_C4$V_iniziale, type = "line", col = "green", xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Line Plot - Battery 2")
-# 
-# # Scatter Plot - Battery 4
-# plot(df_C4$Timestamp_iniziale, df_C4$V_iniziale, pch = 16, col = "green", cex = .5,
-#      xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Scatter Plot - Battery 2")
+# Scatter Plot - Battery 4
+
+data_da_evidenziare <- as.POSIXct("2022-04-09")
+data_da_evidenziare2 <- as.POSIXct("2022-04-07")
+
+plot(df_C4$Timestamp_iniziale, df_C4$V_iniziale, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Initial Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$V_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$V_media, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Average Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$V_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$V_finale, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Final Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$V_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$I_iniziale, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Initial Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$I_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$I_media, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Average Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$I_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$I_finale, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Final Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C4$I_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C4$Timestamp_iniziale, df_C4$Durata_scarica, pch = 16, col = "green", cex = .5,
+     xlab = "Month", ylab = "Discharge duration")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C2$Durata_scarica), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
 
 # Rimuovi la colonna Timestamp_iniziale
-df_C4 <- subset(df_C4, select = -Timestamp_iniziale)
+#df_C4 <- subset(df_C4, select = -Timestamp_iniziale)
 
 
 #! ---------------- Creazione tabella per gruppi C5 -----------
@@ -431,18 +510,53 @@ df_C5$Timestamp_iniziale <- as.POSIXct(df_C5$Timestamp_iniziale)
 # Elimina le righe di df_C5 in cui POC è NA
 df_C5 <- na.omit(df_C5)
 
-# # Imposta la lingua di base su inglese
-# Sys.setlocale("LC_TIME", "C")
-# 
-# # Line Plot - Battery C5
-# plot(df_C5$Timestamp_iniziale, df_C5$V_iniziale, type = "line", col = "orange", xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Line Plot - Battery 3")
-# 
+
 # # Scatter Plot - Battery C5
-# plot(df_C5$Timestamp_iniziale, df_C5$V_iniziale, pch = 16, col = "orange", cex = .5,
-#      xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Scatter Plot - Battery 3")
+plot(df_C5$Timestamp_iniziale, df_C5$V_iniziale, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Initial Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$V_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$V_media, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Average Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$V_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$V_finale, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Final Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$V_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$I_iniziale, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Initial Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$I_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$I_media, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Average Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$I_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$I_finale, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Final Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$I_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C5$Timestamp_iniziale, df_C5$Durata_scarica, pch = 16, col = "orange", cex = .5,
+     xlab = "Month", ylab = "Discharge duration")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C5$Durata_scarica), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
 
 # Rimuovi la colonna Timestamp_iniziale
-df_C5 <- subset(df_C5, select = -Timestamp_iniziale)
+#df_C5 <- subset(df_C5, select = -Timestamp_iniziale)
 
 
 #! ---------------- Creazione tabella per gruppi C7 -----------
@@ -492,18 +606,52 @@ df_C7$Timestamp_iniziale <- as.POSIXct(df_C7$Timestamp_iniziale)
 # Elimina le righe di df_C7 in cui POC è NA
 df_C7 <- na.omit(df_C7)
 
-# # Imposta la lingua di base su inglese
-# Sys.setlocale("LC_TIME", "C")
-# 
-# # Line Plot - Battery C7
-# plot(df_C7$Timestamp_iniziale, df_C7$V_iniziale, type = "line", col = "purple", xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Line Plot - Battery 4")
-# 
 # # Scatter Plot - Battery C7
-# plot(df_C7$Timestamp_iniziale, df_C7$V_iniziale, pch = 16, col = "purple", cex = .5,
-#      xlab = "Initial Timestamp", ylab = "Initial Voltage", main = "Scatter Plot - Battery 4")
+plot(df_C7$Timestamp_iniziale, df_C7$V_iniziale, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Initial Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$V_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$V_media, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Average Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$V_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$V_finale, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Final Voltage")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$V_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$I_iniziale, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Initial Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$I_iniziale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$I_media, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Average Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$I_media), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$I_finale, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Final Intensity")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$I_finale), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
+plot(df_C7$Timestamp_iniziale, df_C7$Durata_scarica, pch = 16, col = "purple", cex = .5,
+     xlab = "Month", ylab = "Discharge duration")
+abline(v = data_da_evidenziare, col = "red", lty = 2)  # Linea verticale rossa a 7 aprile 2022
+text(data_da_evidenziare2, max(df_C7$Durata_scarica), format(data_da_evidenziare2, "%d %b %Y"),
+     pos = 2, offset = 2, col = "red", cex = 0.8)
+grid()
 
 # Rimuovi la colonna Timestamp_iniziale
-df_C7 <- subset(df_C7, select = -Timestamp_iniziale)
+#df_C7 <- subset(df_C7, select = -Timestamp_iniziale)
 
 
 #! ---------------- Divisione dei gruppi rispetto ai POC ----------------

@@ -2,21 +2,22 @@ library(tidyverse)
 library(dplyr)
 library(ggplot2)
 
+load("workspace/my_workspace_project1.RData")
+
 #! ------------------- Leggiamo il Dataset e recuperiamo solo i dati del 2022 -------------------
 
-data <- readRDS("tr_13.rds")
-data_POC_ID <- readRDS("tab_tr_13_POC_ID.rds") #colonna contenente i valori di ID per ogni POC
+data <- readRDS("dataset/tr_13.rds")
+data_POC_ID <- readRDS("dataset/tab_tr_13_POC_ID.rds") #colonna contenente i valori di ID per ogni POC
 data$POC_ID <- data_POC_ID$POC_ID
 data <- subset(data, select = -POC) #eliminazione colonna POC priva di ID
 
 data$Timestamp <- as.POSIXct(data$Timestamp) # Modifichiamo il formato di Timestamp
-data  <-  data[format(data$Timestamp, "%Y") == "2022", ]
+data  <-  data[format(data$Timestamp, "%Y") == "2022", ] 
 
-# Rinomina la colonna relativa alla velocità
-names(data)[names(data) == "_VEHICLE_SPEED"] <- "Speed"
+names(data)[names(data) == "_VEHICLE_SPEED"] <- "Speed" # Rinomina la colonna relativa alla velocità
 
-# Modifica la colonna POC_ID in base al valore di Speed
-data$POC_ID[data$Speed == 0] <- 0
+
+data$POC_ID[data$Speed == 0] <- 0 # Modifica la colonna POC_ID in base al valore di Speed
 
 
 data$Indice <- seq(1, dim(data)[1])
@@ -28,13 +29,11 @@ data$ID_C4  <- ifelse(data$HMI_IBatt_C4 >= 0,   1,  -1)
 data$ID_C5  <- ifelse(data$HMI_IBatt_C5 >= 0,   1,  -1)
 data$ID_C7  <- ifelse(data$HMI_IBatt_C7 >= 0,   1,  -1)
 
-
-
 data$Diversi <- ifelse(rowSums(data[, c("ID_C2", "ID_C4", "ID_C5", "ID_C7")] != data$ID_C2) > 0, 1, 0)
 
 data <- data[data$Diversi != 1, ]
 
-sum(data$Diversi)
+sum(data$Diversi) # viene = 0
 
 #! ------------------- Aggiungiamo la colonna Gruppo per ciascuna batteria -------------------
 
@@ -125,7 +124,7 @@ data <- subset(data, select = -c(Gruppo_C4, Gruppo_C5, Gruppo_C7))
 names(data)[which(names(data) == "Gruppo_C2")] <- "Gruppo"
 
 
-#! ------------------- Seleziono i gruppi buoni ed esporto il nuovo dataset  -------------------
+#! ------------------- Seleziono i gruppi completi ed esporto il nuovo dataset  -------------------
 
 gruppo_buono <- rep(0, max(data$Gruppo) )
 for (group in seq(0, max(data$Gruppo)) ) {
@@ -139,6 +138,8 @@ gruppi_buoni <- which (gruppo_buono == 1)
 data_new <- data[data$Gruppo %in% gruppi_buoni, ]
 
 
-# Save data frame to an RDS file
-saveRDS(data_new, "battery_clean.rds")
+# Salviamo il dataframe in un nuovo file
+saveRDS(data_new, "dataset/battery_clean.rds")
+
+#save.image(file = "workspace/my_workspace_project1.RData")
 
